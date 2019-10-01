@@ -11,25 +11,19 @@ val scalaTestVersion = "3.0.8"
 val rocksDBVersion = "5.18.3"
 val kafkaVersion = "2.3.0"
 
-lazy val kafka = Seq(
-  "org.apache.kafka" % "kafka-clients" % kafkaVersion,
-  "org.apache.kafka" % "kafka-clients" % kafkaVersion classifier "test",
+lazy val dependencies = Seq(
   "org.apache.kafka" % "kafka-streams" % kafkaVersion,
   "org.apache.kafka" %% "kafka-streams-scala" % kafkaVersion,
-  "org.apache.kafka" % "kafka-streams-test-utils" % kafkaVersion,
-  "org.apache.kafka" %% "kafka" % kafkaVersion
+  "com.github.cb372" %% "scalacache-memcached" % "0.28.0",
+  "commons-codec" % "commons-codec" % "1.13"
 )
 
-lazy val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
-lazy val rocksDB = "org.rocksdb" % "rocksdbjni" % rocksDBVersion % "test"
+lazy val test = Seq("org.scalatest" %% "scalatest" % scalaTestVersion % "test")
 
 lazy val kafcache = (project in file(".")).
   settings(commonSettings: _*).
   settings(
-    libraryDependencies ++= Seq(
-      scalaTest,
-      rocksDB
-    ) ++ kafka
+    libraryDependencies ++= dependencies ++ test
   )
 
 publishTo := {
