@@ -10,7 +10,7 @@ libraryDependencies += "com.madewithtea" %% "kafcache" % "1.0.0"
 
 ## Use Memcached 
 
-For more information on Memcached have a look at its documentation on https://memcached.org/.
+Memcached does not support binary keys, therefore the byte arraywill be serialized as hex string. For more information on Memcached have a look at its documentation on https://memcached.org/.
 
 ```
   val store = Stores
