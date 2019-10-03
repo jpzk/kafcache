@@ -8,7 +8,9 @@ In-memory Kafka Streams state store backends for low latency state store lookups
 libraryDependencies += "com.madewithtea" %% "kafcache" % "1.0.0" 
 ```
 
-## Use memcached for your state stores
+## Use Memcached 
+
+For more information on Memcached have a look at its documentation on https://memcached.org/.
 
 ```
   val store = Stores
