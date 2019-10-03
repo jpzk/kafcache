@@ -14,7 +14,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.madewithtea.kafkache
+package com.madewithtea.kafcache
  
 import org.apache.kafka.streams.processor.StateRestoreCallback;
 import org.apache.kafka.streams.state.KeyValueStore
@@ -27,9 +27,6 @@ import net.spy.memcached._
 
 import org.apache.commons.codec.binary.Hex
 
-/**
-  * https://kafka.apache.org/23/javadoc/org/apache/kafka/streams/state/KeyValueStore.html
-  */
 class MemcachedStore(name: String, endpoint: String)
     extends KeyValueStore[Bytes, Array[Byte]]
     {
