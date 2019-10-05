@@ -13,6 +13,8 @@ libraryDependencies += "com.madewithtea" %% "kafcache" % "1.0.0"
 Memcached does not support binary keys, therefore the byte arraywill be serialized as hex string. For more information on Memcached have a look at its documentation on https://memcached.org/.
 
 ```
+  import com.madewithtea.kafcache.MemcachedStoreSupplier
+
   val store = Stores
     .keyValueStoreBuilder(
       new MemcachedStoreSupplier("state-store-name", "localhost:11211"),
