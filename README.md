@@ -5,7 +5,7 @@ In-memory Kafka Streams state store backends for low latency state store lookups
 ## Dependency
 
 ```
-libraryDependencies += "com.madewithtea" %% "kafcache" % "1.0.0" 
+libraryDependencies += "com.madewithtea" %% "kafcache" % "1.0.1" 
 ```
 
 ## Use Memcached 
