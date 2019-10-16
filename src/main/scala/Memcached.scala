@@ -27,7 +27,7 @@ import net.spy.memcached._
 
 import org.apache.commons.codec.binary.Hex
 
-class MemcachedStore(name: String, endpoint: String)
+class MemcachedStore(name: String, endpoint: String, persistent: Boolean = true)
     extends KeyValueStore[Bytes, Array[Byte]]
     {
   import scalacache._
@@ -48,7 +48,7 @@ class MemcachedStore(name: String, endpoint: String)
   def convertKey(bytes: Bytes) = bytes2hex(bytes.get())
 
   def name(): String = name
-  def persistent(): Boolean = false
+  def persistent(): Boolean = this.persistent
   def init(context: ProcessorContext, root: StateStore): Unit = {
 
     val memcachedClient = new MemcachedClient(

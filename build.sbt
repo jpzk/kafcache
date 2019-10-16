@@ -1,7 +1,7 @@
 
 lazy val commonSettings = Seq(
   organization := "com.madewithtea",
-  version := "1.0.0",
+  version := "1.1.0",
   scalaVersion := "2.12.8",
   description := "Memcached and Redis for Kafka Streams",
   organizationHomepage := Some(url("https://www.madewithtea.com")),
