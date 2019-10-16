@@ -5,7 +5,7 @@ In-memory Kafka Streams state store backends for low latency state store lookups
 ## Dependency
 
 ```
-libraryDependencies += "com.madewithtea" %% "kafcache" % "1.0.1" 
+libraryDependencies += "com.madewithtea" %% "kafcache" % "1.1.0" 
 ```
 
 ## Use Memcached 
@@ -23,3 +23,4 @@ Memcached does not support binary keys, therefore the byte arraywill be serializ
     )
   .withLoggingEnabled(new java.util.HashMap[String, String]())
 ```
+
