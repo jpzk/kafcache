@@ -15,7 +15,7 @@
   * limitations under the License.
   */
 package com.madewithtea.kafcache
- 
+
 import org.apache.kafka.streams.processor.StateRestoreCallback;
 import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.streams.state.KeyValueIterator
@@ -24,17 +24,19 @@ import org.apache.kafka.streams.processor.{ProcessorContext, StateStore}
 import org.apache.kafka.streams.state.KeyValueBytesStoreSupplier
 import org.apache.kafka.common.utils.Bytes
 import net.spy.memcached._
+import scala.util.{Try, Failure, Success}
 
 import org.apache.commons.codec.binary.Hex
 
-class MemcachedStore(name: String, endpoint: String, persistent: Boolean = true)
-    extends KeyValueStore[Bytes, Array[Byte]]
-    {
+class MemcachedStore(
+    name: String,
+    endpoint: String,
+    persistent: Boolean = true,
+    recover: Boolean = true
+) extends KeyValueStore[Bytes, Array[Byte]] {
   import scalacache._
   import scalacache.memcached._
-  import scalacache.modes.sync._
-
-  def bytes2hex(bytes: Array[Byte]) = Hex.encodeHex(bytes).mkString
+  import scalacache.modes.try_._
 
   var opened = false;
   var cache: Cache[Array[Byte]] = null
@@ -45,23 +47,36 @@ class MemcachedStore(name: String, endpoint: String, persistent: Boolean = true)
     def decode(bytes: Array[Byte]): Codec.DecodingResult[Array[Byte]] =
       Right(bytes)
   }
-  def convertKey(bytes: Bytes) = bytes2hex(bytes.get())
+
+  def convertKey(bytes: Bytes) = Hex.encodeHex(bytes.get).mkString
 
   def name(): String = name
   def persistent(): Boolean = this.persistent
-  def init(context: ProcessorContext, root: StateStore): Unit = {
 
+  def connect(): Unit = {
+    val cf = new ConnectionFactoryBuilder()
+      .setProtocol(ConnectionFactoryBuilder.Protocol.BINARY)
+      .setFailureMode(FailureMode.Cancel)
+      .build()
     val memcachedClient = new MemcachedClient(
-      new BinaryConnectionFactory(),
+      cf,
       AddrUtil.getAddresses(endpoint)
     )
-
     cache = MemcachedCache(memcachedClient)
-    context.register(root, new StateRestoreCallback {
+  }
+
+  def init(context: ProcessorContext, root: StateStore): Unit = {
+    connect()
+    val recoverCallback = if (recover) new StateRestoreCallback {
       def restore(key: Array[Byte], value: Array[Byte]) = {
         put(Bytes.wrap(key), value)
       }
-    })
+    } else
+      new StateRestoreCallback {
+        def restore(key: Array[Byte], value: Array[Byte]) = {}
+      }
+
+    context.register(root, recoverCallback)
     opened = true
   }
   def isOpen(): Boolean = opened
@@ -78,30 +93,44 @@ class MemcachedStore(name: String, endpoint: String, persistent: Boolean = true)
   def flush(): Unit = {}
 
   def get(key: Bytes): Array[Byte] = {
-    cache.get(convertKey(key)) match {
-      case Some(v) => v
-      case None    => null
+    val t = cache.get(convertKey(key)).map { opt =>
+      opt match {
+        case Some(v) => v
+        case None    => null
+      }
     }
+    t.get // to make it interface compliant
   }
+
   def delete(key: Bytes): Array[Byte] = {
-    val old: Array[Byte] = cache.get(convertKey(key)).getOrElse(null)
-    cache.remove(convertKey(key))
-    old
+    val t = for {
+      old <- cache.get(convertKey(key)).map {
+        case Some(v) => v
+        case None    => null
+      }
+      _ <- cache.remove(convertKey(key))
+    } yield old
+    t.get // to make it interface compliant
   }
-  def put(k: Bytes, v: Array[Byte]) = {
-    cache.put(convertKey(k))(v);
-    ()
+
+  def put(k: Bytes, v: Array[Byte]): Unit = {
+    cache.put(convertKey(k))(v).get // to make it interface compliant
   }
+
   def putIfAbsent(key: Bytes, value: Array[Byte]): Array[Byte] = {
-    cache.get(convertKey(key)) match {
-      case Some(v) => v
-      case None =>
-        cache.put(key)(value)
-        null
+    val t = cache.get(convertKey(key)).map { opt =>
+      opt match {
+        case Some(v) => v
+        case None =>
+          cache.put(key)(value)
+          null
+      }
     }
+    t.get // to make it interface compliant
   }
   def all(): KeyValueIterator[Bytes, Array[Byte]] =
     throw new NotImplementedError("all() not implemented")
+
   def putAll(
       entries: ju.List[
         org.apache.kafka.streams.KeyValue[Bytes, Array[Byte]]
@@ -113,8 +142,13 @@ class MemcachedStore(name: String, endpoint: String, persistent: Boolean = true)
   }
 }
 
-class MemcachedStoreSupplier(name: String, endpoint: String) extends KeyValueBytesStoreSupplier {
-  def get() = new MemcachedStore(name, endpoint)
+class MemcachedStoreSupplier(
+    name: String,
+    endpoint: String,
+    persistent: Boolean = true,
+    recover: Boolean = true
+) extends KeyValueBytesStoreSupplier {
+  def get() = new MemcachedStore(name, endpoint, persistent, recover)
   def metricsScope() = s"memcached-$name"
   def name() = name
 }
