@@ -58,7 +58,7 @@ pomExtra :=
     </developers>
 
 
-micrositeName := "KafCache"
+micrositeName := "Kafcache"
 micrositeDescription := "Memcached and Redis for Kafka Streams"
 micrositeUrl := "http://kafcache.madewithtea.com"
 micrositeDocumentationUrl := "/docs"
