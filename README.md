@@ -1,6 +1,6 @@
 # kafcache
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.madewithtea/kafcache_2.12.svg)](http://search.maven.org/#search%7Cga%7C1%7Credis4cats-effects)
+[![Maven Central](https://img.shields.io/maven-central/v/com.madewithtea/kafcache_2.12.svg)](http://search.maven.org/#search%7Cga%7C1%7Ckafcache)
 
 In-memory Kafka Streams state store backends for low latency state store lookups. In the current version only memcached is available. 
 
