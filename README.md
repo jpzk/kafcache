@@ -10,9 +10,9 @@ libraryDependencies += "com.madewithtea" %% "kafcache" % "1.2.0"
 
 ## Use Memcached 
 
-Memcached does not support binary keys, therefore the byte arraywill be serialized as hex string. For more information on Memcached have a look at its documentation on https://memcached.org/.
+Memcached does not support binary keys, therefore the byte arraywill be serialized as hex string. For more information on Memcached have a look at its documentation on [https://memcached.org/](https://memcached.org/).
 
-```
+```scala
   import com.madewithtea.kafcache.MemcachedStoreSupplier
 
   val store = Stores
@@ -23,4 +23,3 @@ Memcached does not support binary keys, therefore the byte arraywill be serializ
     )
   .withLoggingEnabled(new java.util.HashMap[String, String]())
 ```
-
