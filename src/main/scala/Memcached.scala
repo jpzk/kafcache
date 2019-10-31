@@ -16,13 +16,13 @@
   */
 package com.madewithtea.kafcache
 
-import org.apache.kafka.streams.processor.StateRestoreCallback;
 import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.streams.state.KeyValueIterator
-import java.{util => ju}
-import org.apache.kafka.streams.processor.{ProcessorContext, StateStore}
+import org.apache.kafka.streams.processor.{StateRestoreCallback, ProcessorContext, StateStore}
 import org.apache.kafka.streams.state.KeyValueBytesStoreSupplier
 import org.apache.kafka.common.utils.Bytes
+
+import java.{util => ju}
 import net.spy.memcached._
 import scala.util.{Try, Failure, Success}
 
