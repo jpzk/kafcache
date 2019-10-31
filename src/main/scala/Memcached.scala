@@ -25,8 +25,12 @@ import org.apache.kafka.common.utils.Bytes
 import java.{util => ju}
 import net.spy.memcached._
 import scala.util.{Try, Failure, Success}
-
 import org.apache.commons.codec.binary.Hex
+
+import scalacache._
+import scalacache.memcached._
+import scalacache.modes.try_._
+import scalacache.serialization.Codec
 
 class MemcachedStore(
     name: String,
@@ -34,14 +38,10 @@ class MemcachedStore(
     persistent: Boolean = true,
     recover: Boolean = true
 ) extends KeyValueStore[Bytes, Array[Byte]] {
-  import scalacache._
-  import scalacache.memcached._
-  import scalacache.modes.try_._
 
   var opened = false;
   var cache: Cache[Array[Byte]] = null
-  import scalacache.serialization.Codec
-
+ 
   implicit val codec = new Codec[Array[Byte]] {
     def encode(value: Array[Byte]): Array[Byte] = value
     def decode(bytes: Array[Byte]): Codec.DecodingResult[Array[Byte]] =
