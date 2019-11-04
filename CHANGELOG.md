@@ -4,6 +4,7 @@
 
 - Changed state store recovery callback to batched version using BatchingStateRestoreCallback interface
 - Allows faster recovery
+- Added skip recovery documentation
 
 ## 1.2
 
