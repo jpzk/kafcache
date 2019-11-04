@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3
+
+- Changed state store recovery callback to batched version using BatchingStateRestoreCallback interface
+- Allows faster recovery
+
 ## 1.2
 
 - Exposed recover parameter setting, default set to true. If set to false, it will not write to store on recovery.

@@ -17,7 +17,7 @@
 package com.madewithtea.kafcache
 
 import org.apache.kafka.streams.state.{KeyValueStore, KeyValueIterator, KeyValueBytesStoreSupplier}
-import org.apache.kafka.streams.processor.{StateRestoreCallback, ProcessorContext, StateStore}
+import org.apache.kafka.streams.processor.{BatchingStateRestoreCallback, ProcessorContext, StateStore}
 import org.apache.kafka.common.utils.Bytes
 
 import java.{util => ju}
@@ -29,6 +29,9 @@ import scalacache._
 import scalacache.memcached._
 import scalacache.modes.try_._
 import scalacache.serialization.Codec
+import org.apache.kafka.streams.KeyValue
+
+import scala.collection.JavaConversions._
 
 class MemcachedStore(
     name: String,
@@ -65,18 +68,11 @@ class MemcachedStore(
 
   def init(context: ProcessorContext, root: StateStore): Unit = {
     connect()
-    val recoverCallback = if (recover) new StateRestoreCallback {
-      def restore(key: Array[Byte], value: Array[Byte]) = {
-        put(Bytes.wrap(key), value)
-      }
-    } else
-      new StateRestoreCallback {
-        def restore(key: Array[Byte], value: Array[Byte]) = {}
-      }
-
+    val recoverCallback = if (recover) restoreCallbackRecover() else restoreCallbackNOP()
     context.register(root, recoverCallback)
     opened = true
   }
+
   def isOpen(): Boolean = opened
   def approximateNumEntries(): Long = Long.MaxValue
   def range(
@@ -137,6 +133,20 @@ class MemcachedStore(
     entries.forEach { kv =>
       put(kv.key, kv.value)
     }
+  }
+
+  def restoreCallbackRecover() = new BatchingStateRestoreCallback {
+    def restore(key: Array[Byte], value: Array[Byte]) = 
+      throw new UnsupportedOperationException("Single restore not supported");
+    def restoreAll(records: ju.Collection[KeyValue[Array[Byte],Array[Byte]]]): Unit = {
+     records.foreach { kv => put(Bytes.wrap(kv.key), kv.value) } 
+    }
+  }
+
+  def restoreCallbackNOP() = new BatchingStateRestoreCallback {
+    def restore(key: Array[Byte], value: Array[Byte]) = 
+      throw new UnsupportedOperationException("Single restore not supported");
+    def restoreAll(records: ju.Collection[KeyValue[Array[Byte],Array[Byte]]]): Unit = {}
   }
 }
 
