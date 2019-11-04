@@ -1,5 +1,8 @@
 # kafcache
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/71a5940ef86a4cc88f07d792c93d89c1)](https://www.codacy.com/manual/jpzk/kafcache?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jpzk/kafcache&amp;utm_campaign=Badge_Grade)
+[![Maven Central](https://img.shields.io/maven-central/v/com.madewithtea/kafcache_2.12.svg)](http://search.maven.org/#search%7Cga%7C1%7Ckafcache)
+
 In-memory Kafka Streams state store backends for low latency state store lookups. In the current version only memcached is available. 
 
 ## Dependency
@@ -39,5 +42,4 @@ The following code will initialize a state store but it will not write to it in 
     )
   .withLoggingEnabled(new java.util.HashMap[String, String]())
 ```
-
 
